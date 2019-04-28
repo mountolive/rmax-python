@@ -23,5 +23,4 @@ class StateNode:
     def _check_if_action(self, actions):
         if not isinstance(action, MultiAction):
             raise TypeError("Must pass an instance of type MultiAction")
-        return
 
