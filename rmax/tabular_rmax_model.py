@@ -1,5 +1,7 @@
-from .model.base_model import BaseModel
+from .interaction.environment_outcome import EnvironmentOutcome
 from .interaction.domain import Domain
+from .interaction.transition_probability import TransitionProbability
+from .model.base_model import BaseModel
 
 
 class TabularRmaxModel(BaseModel):
@@ -12,6 +14,7 @@ class TabularRmaxModel(BaseModel):
             raise TypeError("Must pass a correct Domain (sub)type")
         self.domain = domain
         self.state_nodes = {}
+        self.terminal_states = set()
         self.confidence = confidence
 
     def transition_is_modeled(self, state, actions):
@@ -21,8 +24,21 @@ class TabularRmaxModel(BaseModel):
         return False
 
     def transitions(self, state, actions):
-        #TODO: Fill
-        pass
+        transitions = []
+        s_act_node = self.get_state_action_node(state, actions)
+        if not s_act_node:
+            env_out = EnvironmentOutcome(0.0, state, actions,
+                                         state, False)
+            transitions.append(TransitionProbability(1.0, env_out))
+        else:
+            rew = s_act_node.sum_reward / s_act_node.tries
+            for st in s_act_node.outcomes:
+                p = float(s_act_node.outcomes[st]) / s_act_node.tries
+                is_term = st in self.terminal_states
+                env_out = EnvironmentOutcome(rew, state, actions,
+                                             st, is_term)
+                transitions.append(TransitionProbability(p, env_out))
+        return transitions
 
     def get_state_action_node(self, state, actions):
         s_node = self._get_state_node(state)
