@@ -18,7 +18,9 @@ class StateNode:
 
     def add_action_node(self, actions):
         self._check_if_action(actions)
-        self.action_nodes[actions] = StateActionNode(actions)
+        state_action_node = StateActionNode(actions)
+        self.action_nodes[actions] = state_action_node
+        return state_action_node
 
     def _check_if_action(self, actions):
         if not isinstance(action, MultiAction):

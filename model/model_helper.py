@@ -6,22 +6,24 @@ from itertools import product
 class ModelHelper:
     u"""Simple helper class for filtering and misc"""
 
-    def __init__(self, model):
-        if not issubclass(model, BaseModel):
-            raise TypeError('Passed instance is not a model')
-        self.model = model
-
-    def state_transition_model(self, action_types, state):
-        multi_acts = self._get_actions_from_type(action_types, state)
-        trans_modeled = self.model.transition_is_modeled
+    @staticmethod
+    @check_model
+    def state_transition_model(cls, action_types, state, model=None):
+        multi_acts = cls.get_actions_from_type(action_types, state)
+        trans_modeled = model.transition_is_modeled
         return all(trans_modeled(state, action) for action in multi_acts)
 
-    def unmodeled_actions(self, action_types, state):
-        multi_acts = self._get_actions_from_type(action_types, state)
-        trans_modeled = self.model.transition_is_modeled
-        return [act for act in multi_acts if not trans_modeled(state, act)]
+    @staticmethod
+    @check_model
+    def unmodeled_actions(cls, action_types, state, model=None):
+        multi_acts = cls.get_actions_from_type(action_types, state)
+        trans_modeld = model.transition_is_modeled
+        return [act for act in multi_acts if not trans_modeld(state, act)]
 
-    def _get_actions_from_type(self, action_types, statei, n_agents=2):
+    @staticmethod
+    @check_model
+    def get_actions_from_type(cls, action_types, state,
+                              model=None, n_agents=2):
         list_actions = map(lambda x: x.all_applicable_actions(state),
                            action_types)
         actions_set = set([a for li in list_actions for a in li])
@@ -29,3 +31,13 @@ class ModelHelper:
         for vector in product(actions_set, repeat=n_agents):
             result_actions.append(MultiAction(vector))
         return result_actions
+
+    def check_model(func):
+        def check_and_call(*args, **kwargs):
+            model = kwargs['model']
+            if not issubclass(model, BaseModel):
+                raise TypeError('Passed instance is not a model')
+            return func(*args, **kwargs)
+        return check_and_call
+
+
