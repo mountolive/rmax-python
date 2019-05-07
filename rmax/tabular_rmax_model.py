@@ -19,7 +19,6 @@ class TabularRmaxModel(BaseModel):
         self.terminal_states = set()
         self.confidence = confidence
         self.rand_generator = Random()
-        self.
 
     def transition_is_modeled(self, state, actions):
         s_act_node = self.get_state_action_node(state, actions)
