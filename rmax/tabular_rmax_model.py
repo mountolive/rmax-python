@@ -43,9 +43,12 @@ class TabularRmaxModel(BaseModel):
                 transitions.append(TransitionProbability(p, env_out))
         return transitions
 
-    def update_model(self, env_outcome):
-        #TODO: Fill
-        pass
+    def update_model(self, e_outcome):
+        s_state = e_outcome.start_state
+        e_state = e_outcome.end_state
+        if e_outcome.terminated: self.terminal_states.append(e_state)
+        acts, rewrd = e_outcome.actions, e_outcome.reward
+        self.get_action_node(s_state, acts).update(rewrd, e_state)
 
     def sample_by_enumeration(self, state, actions):
         trans_probs = self.transitions(state, actions)
