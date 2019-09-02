@@ -6,7 +6,7 @@ Strongly based (if not plainly copied) from https://github.com/jmacglashan/burla
 It is supposed to be based on Burlap's Tabular Rmax model, 
 with support for any number of players (instead of a MDP's context). 
 
-Yet, very naive tentative with educational purposes.
+Yet, very naive attempt with educational purposes.
 
 Check also https://github.com/david-abel/simple_rl
 
